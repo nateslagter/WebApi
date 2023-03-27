@@ -5,7 +5,7 @@ using WebApi.Models;
 [ApiController]
 public class AssignmentController : ControllerBase
 {
-    static List<Assignment> _assignments = new List<Assignment>
+    List<Assignment> _assignments = new List<Assignment>
     {
         new Assignment{Id = 1, DueDate = DateTime.MaxValue, Grade = 100, ModuleId = 1, Name = "Assignment1ForModule1" },
         new Assignment{Id = 2, DueDate = DateTime.MaxValue, Grade = 0 , ModuleId = 2, Name = "Assignment1ForModule2"}
@@ -13,7 +13,7 @@ public class AssignmentController : ControllerBase
 
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Assignment>>> GetAssignments()
+    public ActionResult<IEnumerable<Assignment>> GetAssignments()
     {
         if (_assignments == null)
         {
@@ -24,7 +24,7 @@ public class AssignmentController : ControllerBase
 
     // GET: api/Assignments/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Assignment>> GetAssignment(int id)
+    public ActionResult<Assignment> GetAssignment(int id)
     {
         if (_assignments == null || _assignments.FirstOrDefault(i => i.Id == id) == null)
         {
@@ -35,7 +35,7 @@ public class AssignmentController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostAssignment(Assignment assignment)
+    public ActionResult PostAssignment([FromBody] Assignment assignment)
     {
         if (!ModelState.IsValid) 
         {
@@ -48,11 +48,11 @@ public class AssignmentController : ControllerBase
         }
 
         _assignments.Add(assignment);
-        return Ok(_assignments);
+        return Ok();
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutAssignment(Assignment assignment)
+    public ActionResult PutAssignment(Assignment assignment)
     {
         if (!ModelState.IsValid)
         {
@@ -72,7 +72,7 @@ public class AssignmentController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAssignment(int id)
+    public ActionResult DeleteAssignment(int id)
     {
         if (id < 0 || id > _assignments.Count)
         {

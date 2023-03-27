@@ -5,14 +5,14 @@ using WebApi.Models;
 [ApiController]
 public class ModuleController : ControllerBase
 {
-    static List<Module> _modules = new List<Module>
+    List<Module> _modules = new List<Module>
     {
         new Module{Id = 1, Name = "CS420Week1", CourseId = 1,}
     };
 
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Module>>> GetModules()
+    public ActionResult<IEnumerable<Module>> GetModules()
     {
         if (_modules == null)
         {
@@ -23,7 +23,7 @@ public class ModuleController : ControllerBase
 
     // GET: api/Assignments/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Module>> GetModule(int id)
+    public ActionResult<Module> GetModule(int id)
     {
         if (_modules == null || _modules.FirstOrDefault(i => i.Id == id) == null)
         {
@@ -34,7 +34,7 @@ public class ModuleController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostModule(Module module)
+    public ActionResult PostModule(Module module)
     {
         if (!ModelState.IsValid)
         {
@@ -47,11 +47,11 @@ public class ModuleController : ControllerBase
         }
 
         _modules.Add(module);
-        return Ok(_modules);
+        return Ok();
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutModule(Module module)
+    public ActionResult PutModule(Module module)
     {
         if (!ModelState.IsValid)
         {
@@ -71,7 +71,7 @@ public class ModuleController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteModule(int id)
+    public ActionResult DeleteModule(int id)
     {
         if (id < 0 || id > _modules.Count)
         {

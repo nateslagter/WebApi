@@ -5,14 +5,14 @@ using WebApi.Models;
 [ApiController]
 public class CourseController : ControllerBase
 {
-    static List<Course> _courses = new List<Course>
+    List<Course> _courses = new List<Course>
     {
         new Course { Id = 1, Name = "Nate's Amazing Class"}
     };
 
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Assignment>>> GetCourses()
+    public ActionResult<IEnumerable<Assignment>> GetCourses()
     {
         if (_courses == null)
         {
@@ -23,7 +23,7 @@ public class CourseController : ControllerBase
 
     // GET: api/Assignments/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Course>> GetCourse(int id)
+    public ActionResult<Course> GetCourse(int id)
     {
         if (_courses == null || _courses.FirstOrDefault(i => i.Id == id) == null)
         {
@@ -34,7 +34,7 @@ public class CourseController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostCourse(Course course)
+    public ActionResult PostCourse(Course course)
     {
         if (!ModelState.IsValid)
         {
@@ -47,11 +47,11 @@ public class CourseController : ControllerBase
         }
 
         _courses.Add(course);
-        return Ok(_courses);
+        return Ok();
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutCourse(Course course)
+    public ActionResult PutCourse(Course course)
     {
         if (!ModelState.IsValid)
         {
@@ -71,7 +71,7 @@ public class CourseController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteCourse(int id)
+    public ActionResult DeleteCourse(int id)
     {
         if (id < 0 || id > _courses.Count)
         {
