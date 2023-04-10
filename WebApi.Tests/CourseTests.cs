@@ -1,69 +1,77 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
+using System.Net.Http.Json;
 using WebApi.Models;
 
 namespace WebApi.Tests;
 
 public class CourseTests
 {
-    private readonly Course _assignmentToPost = new Course()
+    protected readonly WebApplicationFactory<Program> _factory;
+
+    public CourseTests(WebApplicationFactory<Program> factory)
+    {
+        _factory = factory;
+    }
+    private readonly Course _courseToPost = new Course()
     {
         Id = 2,
         Name = "name",
 
     };
 
-    private readonly Course _assignmentToPut = new Course()
+    private readonly Course _courseToPut = new Course()
     {
         Id = 1,
         Name = "name",
     };
     [Fact]
-    public void TestGetAllAssignments()
+    public async Task TestGetAllCoursesAsync()
     {
-        var controller = new CourseController();
-        var result = controller.GetCourses();
-        var resultList = result.Value.ToList();
-        Assert.NotNull(result);
-        Assert.Equal(resultList[0].Name, "Nate's Amazing Class");
+        var client = _factory.CreateClient();
+        var response = await client.GetAsync("api/Course");
+        Assert.NotNull(response);
+        response.EnsureSuccessStatusCode();
     }
 
     [Fact]
-    public void TestGetAssignmentSucceed()
+    public async Task TestGetCourseSucceedAsync()
     {
-        var controller = new CourseController();
-        var result = controller.GetCourse(1);
-        Assert.NotNull(result);
-        Assert.Equal(1, result.Value.Id);
+        var client = _factory.CreateClient();
+        var response = await client.GetAsync("api/Course/2");
+        Assert.NotNull(response);
+        response.EnsureSuccessStatusCode();
     }
 
     [Fact]
-    public void TestPostAssignmentSucceed()
+    public async Task TestPostCourseSucceedAsync()
     {
-        var controller = new CourseController();
-        var result = controller.PostCourse(_assignmentToPost);
-        Assert.NotNull(result);
-        Assert.IsType<OkResult>(result);
+        var client = _factory.CreateClient();
+        var response = await client.PostAsJsonAsync("api/Course", _courseToPost);
+        Assert.NotNull(response);
+        response.EnsureSuccessStatusCode();
     }
 
 
     [Fact]
-    public void TestPutAssignmentSucceed()
+    public async Task TestPutCourseSucceedAsync()
     {
-        var controller = new CourseController();
-        var result = controller.PutCourse(_assignmentToPut);
-        Assert.NotNull(result);
-        Assert.IsType<OkResult>(result);
+        var client = _factory.CreateClient();
+        var response = await client.PutAsJsonAsync("api/Course", _courseToPut);
+        Assert.NotNull(response);
+        response.EnsureSuccessStatusCode();
     }
 
 
 
     [Fact]
-    public void TestDeleteAssignmentSucceed()
+    public async Task TestDeleteCourseSucceedAsync()
     {
-        var controller = new CourseController();
-        var result = controller.DeleteCourse(1);
-        Assert.NotNull(result);
-        Assert.IsType<OkResult>(result);
+        var client = _factory.CreateClient();
+        var response = await client.DeleteAsync("api/Course/2");
+        Assert.NotNull(response);
+        response.EnsureSuccessStatusCode();
 
     }
 }

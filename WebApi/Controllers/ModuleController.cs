@@ -1,36 +1,38 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Models;
+using WebApi.Repos;
 
 [Route("api/[controller]")]
 [ApiController]
 public class ModuleController : ControllerBase
 {
-    List<Module> _modules = new List<Module>
-    {
-        new Module{Id = 1, Name = "CS420Week1", CourseId = 1,}
-    };
+    private readonly IModuleRepo _moduleRepo;
 
+    public ModuleController(IModuleRepo moduleRepo)
+    {
+        _moduleRepo = moduleRepo;
+    }
 
     [HttpGet]
     public ActionResult<IEnumerable<Module>> GetModules()
     {
-        if (_modules == null)
+        if (_moduleRepo.GetModules == null)
         {
             return NotFound();
         }
-        return Ok(_modules);
+        return Ok(_moduleRepo.GetModules);
     }
 
     // GET: api/Assignments/5
     [HttpGet("{id}")]
     public ActionResult<Module> GetModule(int id)
     {
-        if (_modules == null || _modules.FirstOrDefault(i => i.Id == id) == null)
+        if (_moduleRepo.GetModules == null )
         {
             return NotFound();
         }
 
-        return _modules.FirstOrDefault(i => i.Id == id);
+        return _moduleRepo.GetModule(id);
     }
 
     [HttpPost]
@@ -46,7 +48,7 @@ public class ModuleController : ControllerBase
             return BadRequest(new ValidationProblemDetails());
         }
 
-        _modules.Add(module);
+        _moduleRepo.PostModule(module);
         return Ok();
     }
 
@@ -58,28 +60,25 @@ public class ModuleController : ControllerBase
             return BadRequest(new ValidationProblemDetails(ModelState));
         }
 
-        if (module.Id < 0 || module.Id > _modules.Count)
+        if (module.Id < 0)
         {
             return BadRequest(new ValidationProblemDetails());
         }
 
 
-        Module moduleToRemove = _modules.FirstOrDefault(i => i.Id == module.Id);
-        _modules.Remove(moduleToRemove);
-        _modules.Add(module);
+        _moduleRepo.PutModule(module);
         return Ok();
     }
 
     [HttpDelete("{id}")]
     public ActionResult DeleteModule(int id)
     {
-        if (id < 0 || id > _modules.Count)
+        if (id < 0)
         {
             return BadRequest(new ValidationProblemDetails());
         }
 
-        Module moduleToRemove = _modules.FirstOrDefault(i => i.Id == id);
-        _modules.Remove(moduleToRemove);
+        _moduleRepo.DeleteModule(id);
         return Ok();
     }
 }

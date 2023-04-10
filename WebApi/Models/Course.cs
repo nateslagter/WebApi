@@ -5,6 +5,6 @@
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public List<Module>? Modules { get; set; }
+        public virtual List<Module>? Modules { get; } = new();
     }
 }

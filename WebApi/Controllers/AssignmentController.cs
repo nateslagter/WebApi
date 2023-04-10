@@ -1,37 +1,42 @@
 using Microsoft.AspNetCore.Mvc;
+using System;
 using WebApi.Models;
+using WebApi.Repos;
 
 [Route("api/[controller]")]
 [ApiController]
 public class AssignmentController : ControllerBase
 {
-    List<Assignment> _assignments = new List<Assignment>
-    {
-        new Assignment{Id = 1, DueDate = DateTime.MaxValue, Grade = 100, ModuleId = 1, Name = "Assignment1ForModule1" },
-        new Assignment{Id = 2, DueDate = DateTime.MaxValue, Grade = 0 , ModuleId = 2, Name = "Assignment1ForModule2"}
-    };
+    private readonly IAssignmentRepo? _assignmentRepo;
 
+    public AssignmentController(IAssignmentRepo? assignmentRepo)
+    {
+        _assignmentRepo = assignmentRepo;
+    }
 
     [HttpGet]
     public ActionResult<IEnumerable<Assignment>> GetAssignments()
     {
-        if (_assignments == null)
+        List<Assignment> assignments = new List<Assignment>();
+        assignments = _assignmentRepo.GetAssignments();
+        if (assignments == null)
         {
             return NotFound();
         }
-        return Ok(_assignments);
+        return Ok(assignments);
     }
 
     // GET: api/Assignments/5
     [HttpGet("{id}")]
     public ActionResult<Assignment> GetAssignment(int id)
     {
-        if (_assignments == null || _assignments.FirstOrDefault(i => i.Id == id) == null)
+        Assignment assignment = _assignmentRepo.GetAssignment(id);
+        if (assignment == null)
         {
             return NotFound();
         }
 
-        return _assignments.FirstOrDefault(i => i.Id == id);
+        return assignment;
     }
 
     [HttpPost]
@@ -41,13 +46,7 @@ public class AssignmentController : ControllerBase
         {
             return BadRequest(new ValidationProblemDetails(ModelState));
         }
-
-        if (assignment.Id < 0) 
-        {
-            return BadRequest(new ValidationProblemDetails());
-        }
-
-        _assignments.Add(assignment);
+        _assignmentRepo.PostAssignment(assignment);
         return Ok();
     }
 
@@ -58,29 +57,18 @@ public class AssignmentController : ControllerBase
         {
             return BadRequest(new ValidationProblemDetails(ModelState));
         }
-
-        if (assignment.Id < 0 || assignment.Id > _assignments.Count)
-        {
-            return BadRequest(new ValidationProblemDetails());
-        }
-
-
-        Assignment assignmentToRemove = _assignments.FirstOrDefault(i => i.Id == assignment.Id);
-        _assignments.Remove(assignmentToRemove);
-        _assignments.Add(assignment);
+        _assignmentRepo.PutAssignment(assignment);
         return Ok();
     }
 
     [HttpDelete("{id}")]
     public ActionResult DeleteAssignment(int id)
     {
-        if (id < 0 || id > _assignments.Count)
+        if (_assignmentRepo.GetAssignment(id) == null)
         {
-            return BadRequest(new ValidationProblemDetails());
+            return BadRequest();
         }
-
-        Assignment assignmentToRemove = _assignments.FirstOrDefault(i => i.Id == id);
-        _assignments.Remove(assignmentToRemove);
+        _assignmentRepo.DeleteAssignment(id);
         return Ok();
     }
 }

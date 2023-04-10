@@ -1,10 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
+using System.Net.Http.Json;
 using WebApi.Models;
 
 namespace WebApi.Tests;
 
 public class AssignmentTests
 {
+    protected readonly WebApplicationFactory<Program> _factory;
+
+    public AssignmentTests(WebApplicationFactory<Program> factory)
+    {
+        _factory = factory;
+    }
     private readonly Assignment _assignmentToPost = new Assignment()
     {
         Id = 3,
@@ -23,52 +32,51 @@ public class AssignmentTests
         ModuleId = 1,
     };
     [Fact]
-    public void TestGetAllAssignments()
+    public async Task TestGetAllAssignmentsAsync()
     {
-        var controller = new AssignmentController();
-        var result = controller.GetAssignments();
-        var resultList = result.Value.ToList();
-        Assert.NotNull(result);
-        Assert.Equal(resultList[0].Name, "Assignment1ForModule1");
+        var client = _factory.CreateClient();
+        var response = await client.GetAsync("api/Assignment");
+        Assert.NotNull(response);
+        response.EnsureSuccessStatusCode();
     }
 
     [Fact]
-    public void TestGetAssignmentSucceed()
+    public async Task TestGetAssignmentSucceedAsync()
     {
-        var controller = new AssignmentController();
-        var result = controller.GetAssignment(1);
-        Assert.NotNull(result);
-        Assert.Equal(1,result.Value.Id);
+        var client = _factory.CreateClient();
+        var response = await client.GetAsync("api/Assignment/2");
+        Assert.NotNull(response);
+        response.EnsureSuccessStatusCode();
     }
 
     [Fact]
-    public void TestPostAssignmentSucceed()
+    public async Task TestPostAssignmentSucceedAsync()
     {
-        var controller = new AssignmentController();
-        var result = controller.PostAssignment(_assignmentToPost); 
-        Assert.NotNull(result);
-        Assert.IsType<OkResult>(result);
+        var client = _factory.CreateClient();
+        var response = await client.PostAsJsonAsync("api/Assignment", _assignmentToPost);
+        Assert.NotNull(response);
+        response.EnsureSuccessStatusCode();
     }
 
 
     [Fact]
-    public void TestPutAssignmentSucceed()
+    public async Task TestPutAssignmentSucceedAsync()
     {
-        var controller = new AssignmentController();
-        var result = controller.PutAssignment(_assignmentToPut);
-        Assert.NotNull(result);
-        Assert.IsType<OkResult>(result);
+        var client = _factory.CreateClient();
+        var response = await client.PutAsJsonAsync("api/Assignment", _assignmentToPut);
+        Assert.NotNull(response);
+        response.EnsureSuccessStatusCode();
     }
 
 
 
     [Fact]
-    public void TestDeleteAssignmentSucceed()
+    public async Task TestDeleteAssignmentSucceedAsync()
     {
-        var controller = new AssignmentController();
-        var result = controller.DeleteAssignment(1);
-        Assert.NotNull(result);
-        Assert.IsType<OkResult>(result);
+        var client = _factory.CreateClient();
+        var response = await client.DeleteAsync("api/Assignment/2");
+        Assert.NotNull(response);
+        response.EnsureSuccessStatusCode();
 
     }
 }

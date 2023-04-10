@@ -1,36 +1,38 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Models;
+using WebApi.Repos;
 
 [Route("api/[controller]")]
 [ApiController]
 public class CourseController : ControllerBase
 {
-    List<Course> _courses = new List<Course>
-    {
-        new Course { Id = 1, Name = "Nate's Amazing Class"}
-    };
+    private readonly ICourseRepo _courseRepo;
 
+    public CourseController(ICourseRepo courseRepo)
+    {
+        _courseRepo = courseRepo;
+    }
 
     [HttpGet]
-    public ActionResult<IEnumerable<Assignment>> GetCourses()
+    public ActionResult<IEnumerable<Course>> GetCourses()
     {
-        if (_courses == null)
+        if (_courseRepo.GetCourses == null)
         {
             return NotFound();
         }
-        return Ok(_courses);
+        return Ok(_courseRepo.GetCourses);
     }
 
     // GET: api/Assignments/5
     [HttpGet("{id}")]
     public ActionResult<Course> GetCourse(int id)
     {
-        if (_courses == null || _courses.FirstOrDefault(i => i.Id == id) == null)
+        if (_courseRepo.GetCourses == null)
         {
             return NotFound();
         }
 
-        return _courses.FirstOrDefault(i => i.Id == id);
+        return _courseRepo.GetCourse(id);
     }
 
     [HttpPost]
@@ -46,7 +48,7 @@ public class CourseController : ControllerBase
             return BadRequest(new ValidationProblemDetails());
         }
 
-        _courses.Add(course);
+        _courseRepo.PostCourse(course);
         return Ok();
     }
 
@@ -58,28 +60,25 @@ public class CourseController : ControllerBase
             return BadRequest(new ValidationProblemDetails(ModelState));
         }
 
-        if (course.Id < 0 || course.Id > _courses.Count)
+        if (course.Id < 0)
         {
             return BadRequest(new ValidationProblemDetails());
         }
 
 
-        Course courseToRemove = _courses.FirstOrDefault(i => i.Id == course.Id);
-        _courses.Remove(courseToRemove);
-        _courses.Add(course);
+        _courseRepo.PutCourse(course);
         return Ok();
     }
 
     [HttpDelete("{id}")]
     public ActionResult DeleteCourse(int id)
     {
-        if (id < 0 || id > _courses.Count)
+        if (id < 0)
         {
             return BadRequest(new ValidationProblemDetails());
         }
 
-        Course courseToRemove = _courses.FirstOrDefault(i => i.Id == id);
-        _courses.Remove(courseToRemove);
+        _courseRepo.DeleteCourse(id);
         return Ok();
     }
 }

@@ -2,11 +2,20 @@
 using WebApi.Models;
 using System.Reflection;
 using Module = WebApi.Models.Module;
+using System.Net.Http.Json;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 namespace WebApi.Tests
 {
     public class ModuleTests
     {
+        protected readonly WebApplicationFactory<Program> _factory;
+
+        public ModuleTests(WebApplicationFactory<Program> factory)
+        {
+            _factory = factory;
+        }
         private readonly Module _moduleToPost = new Module()
         {
             Id = 2,
@@ -21,52 +30,52 @@ namespace WebApi.Tests
             CourseId = 1,
         };
         [Fact]
-        public void TestGetAllModules()
+        public async Task TestGetAllModuleAsync()
         {
-            var controller = new ModuleController();
-            var result = controller.GetModules();
-            var resultList = result.Value.ToList();
-            Assert.NotNull(result);
-            Assert.Equal(resultList[0].Name, "CS420Week1");
+            var client = _factory.CreateClient();
+            var response = await client.GetAsync("api/Module");
+            Assert.NotNull(response);
+            response.EnsureSuccessStatusCode();
         }
 
         [Fact]
-        public void TestGetModuleSucceed()
+        public async Task TestGetModuleSucceedAsync()
         {
-            var controller = new ModuleController();
-            var result = controller.GetModule(1);
-            Assert.NotNull(result);
-            Assert.Equal(1, result.Value.Id);
+            var client = _factory.CreateClient();
+            var response = await client.GetAsync("api/Module/2");
+            Assert.NotNull(response);
+            response.EnsureSuccessStatusCode();
         }
 
         [Fact]
-        public void TestPostModuleSucceed()
+        public async Task TestPostModuleSucceedAsync()
         {
-            var controller = new ModuleController();
-            var result = controller.PostModule(_moduleToPost);
-            Assert.NotNull(result);
-            Assert.IsType<OkResult>(result);
+            var client = _factory.CreateClient();
+            var response = await client.PostAsJsonAsync("api/Module", _moduleToPost);
+            Assert.NotNull(response);
+            response.EnsureSuccessStatusCode();
         }
 
 
         [Fact]
-        public void TestPutModuleSucceed()
+        public async Task TestPutModuleSucceedAsync()
         {
-            var controller = new ModuleController();
-            var result = controller.PutModule(_moduleToPut);
-            Assert.NotNull(result);
-            Assert.IsType<OkResult>(result);
+            var client = _factory.CreateClient();
+            var response = await client.PutAsJsonAsync("api/Module", _moduleToPut);
+            Assert.NotNull(response);
+            response.EnsureSuccessStatusCode();
         }
 
 
 
         [Fact]
-        public void TestDeleteModuleSucceed()
+        public async Task TestDeleteModuleSucceedAsync()
         {
-            var controller = new ModuleController();
-            var result = controller.DeleteModule(1);
-            Assert.NotNull(result);
-            Assert.IsType<OkResult>(result);
+            var client = _factory.CreateClient();
+            var response = await client.DeleteAsync("api/Module/2");
+            Assert.NotNull(response);
+            response.EnsureSuccessStatusCode();
+
         }
     }
 }
